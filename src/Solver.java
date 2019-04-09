@@ -1,8 +1,6 @@
 import edu.princeton.cs.algs4.StdOut;
-import edu.princeton.cs.algs4.StdIn;
+import edu.princeton.cs.algs4.In;
 import edu.princeton.cs.algs4.MinPQ;
-
-import javax.crypto.MacSpi;
 import java.util.*;
 
 public class Solver {
@@ -112,7 +110,7 @@ public class Solver {
         startBoard = initial;
         if (!startBoard.isSolvable())
             throw new IllegalArgumentException("Board is unsolvable");
-        movesTaken = 0;
+        movesTaken = -1;
         solveAStar(initial);
     }
 
@@ -194,18 +192,33 @@ public class Solver {
 
     public static void main(String[] args)
     {
+        In readFile = new In(args[0]);
+
+        List<Integer> readInts = new ArrayList<>();
+        String data = readFile.readAll();
+        data = data.replaceAll("\\s+","");
+        int length = (int)Math.sqrt(data.length()); // Size will be the sqrt
+        int[][] puzzle = new int[length][length];
+        for (int i = 0; i < length; i++)
+            for (int j = 0; j < length; j++)
+                puzzle[i][j] = (data.charAt(i*length + j) - '0'); // Convert to int
         //int[][] testVals = {{1, 2, 3}, {4, 5, 0}, {7, 8, 6}};
         //int[][] testVals = {{0, 1, 3}, {4, 2, 5}, {7, 8, 6}};
-        int[][] testVals = {{1, 2, 3, 4}, {5, 6, 0, 8}, {9, 10, 7, 11}, {13, 14, 15, 12}};
-        Board testBoard = new Board(testVals);
-        StdOut.println("Starting with: \n" + testBoard.toString());
+        //int[][] testVals = {{1, 2, 3, 4}, {5, 6, 0, 8}, {9, 10, 7, 11}, {13, 14, 15, 12}};
+        Board testBoard = new Board(puzzle);
+        if (!testBoard.isSolvable())
+        {
+            StdOut.println("Unsolvable puzzle");
+            return;
+        }
+        //StdOut.println("Starting with: \n" + testBoard.toString());
         Solver testSolver = new Solver(testBoard);
+
+        StdOut.println("Minimum number of moves = " + testSolver.moves());
         for(Board board: testSolver.solution())
         {
             StdOut.println(board.toString());
         }
-        StdOut.println("Took " + testSolver.moves() + " moves to solve");
-
     }
 
 }
