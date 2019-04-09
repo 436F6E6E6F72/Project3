@@ -11,45 +11,32 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/Board.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="748">
-              <caret line="59" column="5" lean-forward="true" selection-start-line="32" selection-start-column="4" selection-end-line="59" selection-end-column="5" />
+            <state relative-caret-position="620">
+              <caret line="316" selection-start-line="316" selection-end-line="316" />
               <folding>
                 <element signature="imports" expanded="true" />
                 <element signature="e#1026#1027#0" expanded="true" />
                 <element signature="e#1088#1089#0" expanded="true" />
                 <element signature="e#1252#1253#0" expanded="true" />
                 <element signature="e#1303#1304#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/Solver.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="17">
-              <caret line="179" column="2" selection-start-line="179" selection-start-column="2" selection-end-line="179" selection-end-column="2" />
-              <folding>
-                <element signature="imports" expanded="true" />
-                <element signature="class#Game#0;class#Solver#0" />
-                <element signature="e#6182#6183#0" expanded="true" />
-                <element signature="e#6365#6366#0" expanded="true" />
+                <element signature="e#5872#5873#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/edu/princeton/cs/algs4/MinPQ.java">
+        <entry file="file://$PROJECT_DIR$/src/Solver.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="204">
-              <caret line="207" column="66" lean-forward="true" selection-start-line="207" selection-start-column="66" selection-end-line="207" selection-end-column="66" />
+            <state relative-caret-position="569">
+              <caret line="198" column="8" selection-start-line="198" selection-start-column="8" selection-end-line="198" selection-end-column="8" />
               <folding>
-                <element signature="e#6917#6918#0" expanded="true" />
-                <element signature="e#6952#6953#0" expanded="true" />
+                <element signature="imports" expanded="true" />
+                <element signature="e#5318#5319#0" expanded="true" />
+                <element signature="e#5501#5502#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -72,8 +59,8 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/src/Board.java" />
         <option value="$PROJECT_DIR$/src/Solver.java" />
+        <option value="$PROJECT_DIR$/src/Board.java" />
       </list>
     </option>
   </component>
@@ -187,8 +174,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/edu/princeton/cs/algs4/MinPQ.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="204">
-          <caret line="207" column="66" lean-forward="true" selection-start-line="207" selection-start-column="66" selection-end-line="207" selection-end-column="66" />
+        <state relative-caret-position="221">
+          <caret line="208" column="9" lean-forward="true" selection-start-line="208" selection-start-column="9" selection-end-line="208" selection-end-column="9" />
           <folding>
             <element signature="e#6917#6918#0" expanded="true" />
             <element signature="e#6952#6953#0" expanded="true" />
@@ -196,29 +183,29 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/Solver.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="569">
+          <caret line="198" column="8" selection-start-line="198" selection-start-column="8" selection-end-line="198" selection-end-column="8" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#5318#5319#0" expanded="true" />
+            <element signature="e#5501#5502#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/Board.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="748">
-          <caret line="59" column="5" lean-forward="true" selection-start-line="32" selection-start-column="4" selection-end-line="59" selection-end-column="5" />
+        <state relative-caret-position="620">
+          <caret line="316" selection-start-line="316" selection-end-line="316" />
           <folding>
             <element signature="imports" expanded="true" />
             <element signature="e#1026#1027#0" expanded="true" />
             <element signature="e#1088#1089#0" expanded="true" />
             <element signature="e#1252#1253#0" expanded="true" />
             <element signature="e#1303#1304#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/Solver.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="17">
-          <caret line="179" column="2" selection-start-line="179" selection-start-column="2" selection-end-line="179" selection-end-column="2" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="class#Game#0;class#Solver#0" />
-            <element signature="e#6182#6183#0" expanded="true" />
-            <element signature="e#6365#6366#0" expanded="true" />
+            <element signature="e#5872#5873#0" expanded="true" />
           </folding>
         </state>
       </provider>

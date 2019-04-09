@@ -2,9 +2,8 @@ import edu.princeton.cs.algs4.StdOut;
 import edu.princeton.cs.algs4.StdIn;
 import edu.princeton.cs.algs4.MinPQ;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import javax.crypto.MacSpi;
+import java.util.*;
 
 public class Solver {
 
@@ -86,26 +85,15 @@ public class Solver {
         {
             if (this == y) // Same ref
                 return 0;
-            if (y == null || y.getClass() != this.getClass()) // Null or different class
+            if (y == null)
                 return -1;
             Game testGame = (Game)y;
-            // Check for size
-            if (testGame.board.size() != board.size())
+            if (this.priority < testGame.priority)
                 return -1;
-            // Check for tile equality
-            int length = (int)Math.sqrt(testGame.board.size());
-            for (int i = 0; i < length; i++)
-            {
-                for (int j = 0; j < length; j++)
-                {
-                    if (testGame.board.tileAt(i, j) != board.tileAt(i, j))
-                        if (testGame.board.tileAt(i, j) > board.tileAt(i, j))
-                            return -1;
-                        else
-                            return 1;
-                }
-            }
-            return 0;
+            else if (this.priority == testGame.priority)
+                return 0;
+            else
+                return 1;
         }
     }
 
@@ -134,17 +122,19 @@ public class Solver {
      */
     private void solveAStar(Board initial)
     {
-        MinPQ<Game> closedSet = new MinPQ<Game>(); // Already evaluated games
-        MinPQ<Game> openSet = new MinPQ<Game>(); // Discovered games
-        Game parentGame; // The parent of the current open set
-        openSet.insert(new Game(initial, 0, null)); // Start off with the initial
-        Game current = null;
-        int gScore;
+        MinPQ<Game> closedSet = new MinPQ<>();
+        MinPQ<Game> openSet = new MinPQ<>();
 
-        while (openSet.size() != 0)
+        Game current = new Game(initial, 0, null);
+
+        openSet.insert(current);
+
+        while (openSet.size() > 0)
         {
+            current = openSet.delMin();
+            closedSet.insert(current);
 
-            if (current != null && current.board.isGoal())
+            if (current.board.isGoal())
             {
                 List<Board> solvedList = new ArrayList<>();
                 while (current != null)
@@ -156,40 +146,30 @@ public class Solver {
                 solvedSequence = new BoardIterable(solvedList);
                 break;
             }
-
-            // Get the lowest from the open set
-            current = openSet.delMin();
-            // Add it to the closed set
-            closedSet.insert(current);
-
-            StdOut.println(current.board.toString());
-
-            // Iterate through all neighbors, remove duplicates, find best
-            for(Board neighbor: current.board.neighbors())
+            for (Board neighbor : current.board.neighbors())
             {
-                if (closedSet.size() > 0)
-                {
-                    boolean equal = false;
-                    for (Game closed: closedSet) // Check for neighbor in closed
-                        if (closed.board.equals(neighbor))
-                            equal = true;
-                    if (equal)
-                        continue;
-                }
-//                if (neighbor.manhattan() + 1 + current.numMoves > current.priority)
-//                    continue;
-
-                if (openSet.size() > 0)
-                {
-                    boolean equal = false;
-                    for (Game open: openSet) // Check for neighbor in open
-                        if (open.board.equals(neighbor))
-                            equal = true;
-                    if (!equal)
-                        openSet.insert(new Game(neighbor, current.numMoves + 1, current));
-                }
+                boolean alreadyStored = false;
+                for(Game closed : closedSet)
+                    if (closed.board.equals(neighbor))
+                        alreadyStored = true;
+                if (alreadyStored)
+                    continue;
+                for(Game open : openSet)
+                    if (open.board.equals(neighbor))
+                        alreadyStored = true;
+                if (!alreadyStored)
+                    openSet.insert(new Game(neighbor, current.numMoves + 1, current)); // Discover it
                 else
-                    openSet.insert(new Game(neighbor, current.numMoves + 1, current));
+                    for(Game open : openSet)
+                        if (open.board.equals(neighbor) && current.numMoves + 1 < open.numMoves)
+                            break;
+                        else if (open.board.equals(neighbor) && current.numMoves + 1 > open.numMoves)
+                        {
+                            open.numMoves = current.numMoves + 1;
+                            open.parent = current;
+                            open.priority = open.numMoves + open.board.manhattan();
+                        }
+
             }
         }
     }
@@ -214,7 +194,9 @@ public class Solver {
 
     public static void main(String[] args)
     {
-        int[][] testVals = {{0, 1, 2, 3}, {4, 5, 6, 7}, {8, 9, 10, 11}, {12, 13, 14, 15}};
+        //int[][] testVals = {{1, 2, 3}, {4, 5, 0}, {7, 8, 6}};
+        //int[][] testVals = {{0, 1, 3}, {4, 2, 5}, {7, 8, 6}};
+        int[][] testVals = {{1, 2, 3, 4}, {5, 6, 0, 8}, {9, 10, 7, 11}, {13, 14, 15, 12}};
         Board testBoard = new Board(testVals);
         StdOut.println("Starting with: \n" + testBoard.toString());
         Solver testSolver = new Solver(testBoard);

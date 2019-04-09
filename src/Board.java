@@ -179,17 +179,23 @@ public class Board {
     private int computeManhattan()
     {
         int manhattanVal = 0;
-        int expected = 1;
+        BoardVector offset;
         for (int i = 0; i < boardTiles.length; i++)
         {
             for (int j = 0; j < boardTiles[0].length; j++)
             {
-                if (boardTiles[i][j] != expected && i != boardTiles.length -1 && j != boardTiles[0].length - 1)
+                if (boardTiles[i][j] != (i *  boardTiles.length) + j + 1 ||
+                    i == boardTiles.length - 1 && j == boardTiles.length - 1 && boardTiles[i][j] != 0 )
                 {
-                    BoardVector offset = getTilePos(expected);
+                    if (i == boardTiles.length - 1 && j == boardTiles.length - 1)
+                    {
+                        offset = getTilePos(0);
+                        manhattanVal += (Math.abs(offset.xVal - i) + Math.abs(offset.yVal - j));
+                        continue;
+                    }
+                    offset = getTilePos(i* boardTiles.length + j + 1);
                     manhattanVal += (Math.abs(offset.xVal - i) + Math.abs(offset.yVal - j));
                 }
-                expected++;
             }
         }
         return manhattanVal;
@@ -299,17 +305,23 @@ public class Board {
             {
                 if (low == boardTiles[i][j]) // 0, 0
                     continue;
-                if (boardTiles[i][j] == 0) // blank tile
+                if (boardTiles[i][j] == 0) // blank tile, track it
                     row0 = i;
-                else if (low < boardTiles[i][j]) // If the last low is < the next value no inversion
+                if (low < boardTiles[i][j]) // If the last low is < the next value no inversion and accounting for 0
+                    low = boardTiles[i][j];
+                else if (i != boardTiles.length - 1 && j != boardTiles.length - 1 && boardTiles[i][j] != 0)
                     low = boardTiles[i][j];
                 else // Inversion
+                {
                     inversions++;
+                    low = boardTiles[i][j];
+                }
             }
         }
         // Even board size
         if (boardTiles.length % 2 == 0)
         {
+            StdOut.println(inversions + " " + row0);
             if ((inversions + row0) % 2 == 0 ) // inversions + row with blank is even
                 return false;
             else // Is odd
