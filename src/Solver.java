@@ -5,11 +5,18 @@ import java.util.*;
 
 public class Solver {
 
+    /**
+     * Iterable class for the final set of boards
+     */
     private class BoardIterable implements Iterable<Board> {
 
         private List<Board> boardList;
         private int index;
 
+        /**
+         * Constructor for the class
+         * @param boards A list of boards to build off of
+         */
         public BoardIterable(List<Board> boards)
         {
             boardList = new ArrayList<>();
@@ -18,17 +25,29 @@ public class Solver {
             index = 0;
         }
 
+        /**
+         * Is there an next board?
+         * @return true if yes, false if no
+         */
         public boolean hasNext()
         {
             return (index != boardList.size() - 1);
         }
 
+        /**
+         * Returns the next board in the list
+         * @return Board that is next
+         */
         public Board next()
         {
             index++;
             return boardList.get(index);
         }
 
+        /**
+         * Returns the iterator for the class
+         * @return iterator for the class
+         */
         public Iterator<Board> iterator()
         {
             return boardList.iterator();
@@ -41,12 +60,21 @@ public class Solver {
      */
     private class Game implements Comparable<Object>
     {
+        // Number of moved to get here
         int numMoves;
+        // Priority of the game, board Manhattan + numMoves
         int priority;
+        // Board being wrapped
         Board board;
+        // Parent game containing board's parent board
         Game parent;
 
-
+        /**
+         * Cnstructor for the helper class
+         * @param curr Board for the class
+         * @param move Move # that reached the board
+         * @param parentNode Parent game containing the parent board
+         */
         public Game(Board curr, int move, Game parentNode)
         {
             board = curr;
@@ -55,6 +83,11 @@ public class Solver {
             priority = numMoves + board.manhattan();
         }
 
+        /**
+         * Override function for equality. Works the same as the board equality override
+         * @param y The object (Game) to compare against
+         * @return True if same, false if not
+         */
         @Override
         public boolean equals(Object y)
         {
@@ -68,16 +101,17 @@ public class Solver {
                 return false;
             // Check for tile equality
             for (int i = 0; i < board.size(); i++)
-            {
                 for (int j = 0; j < board.size(); j++)
-                {
                     if (testBoard.tileAt(i, j) != board.tileAt(i, j))
                         return false;
-                }
-            }
             return true;
         }
 
+        /**
+         * Override function for compareTo for the minPQ class to find out what has lowest priority
+         * @param y The object (Game) to compare against
+         * @return -1 if lower, 0 if same, 1 if greater
+         */
         @Override
         public int compareTo(Object y)
         {
@@ -95,8 +129,9 @@ public class Solver {
         }
     }
 
-    private Board startBoard;
+    // The iterable for the solved sequence
     private BoardIterable solvedSequence;
+    // Local counter for the number of moves taken. Used to solve and return
     private int movesTaken;
 
     /**
@@ -107,8 +142,7 @@ public class Solver {
     {
         if (initial == null)
             throw new IllegalArgumentException("Board cannot be null");
-        startBoard = initial;
-        if (!startBoard.isSolvable())
+        if (!initial.isSolvable())
             throw new IllegalArgumentException("Board is unsolvable");
         movesTaken = -1;
         solveAStar(initial);
@@ -120,6 +154,7 @@ public class Solver {
      */
     private void solveAStar(Board initial)
     {
+        // Init local PQs
         MinPQ<Game> closedSet = new MinPQ<>();
         MinPQ<Game> openSet = new MinPQ<>();
 
@@ -127,13 +162,16 @@ public class Solver {
 
         openSet.insert(current);
 
+        // Loop through all open set contents
         while (openSet.size() > 0)
         {
             current = openSet.delMin();
             closedSet.insert(current);
 
+            // The current is solved
             if (current.board.isGoal())
             {
+                // Build list based off of parent path
                 List<Board> solvedList = new ArrayList<>();
                 while (current != null)
                 {
@@ -144,24 +182,25 @@ public class Solver {
                 solvedSequence = new BoardIterable(solvedList);
                 break;
             }
+            // Check all neighbors
             for (Board neighbor : current.board.neighbors())
             {
                 boolean alreadyStored = false;
-                for(Game closed : closedSet)
+                for(Game closed : closedSet) // Look for it in closed, if in closed skip
                     if (closed.board.equals(neighbor))
                         alreadyStored = true;
-                if (alreadyStored)
+                if (alreadyStored) // Skip
                     continue;
-                for(Game open : openSet)
+                for(Game open : openSet) // Loop for it in open set
                     if (open.board.equals(neighbor))
                         alreadyStored = true;
-                if (!alreadyStored)
+                if (!alreadyStored) // If not in open set add it!
                     openSet.insert(new Game(neighbor, current.numMoves + 1, current)); // Discover it
                 else
-                    for(Game open : openSet)
-                        if (open.board.equals(neighbor) && current.numMoves + 1 < open.numMoves)
+                    for(Game open : openSet) // If it is check what the priority is vs current
+                        if (open.board.equals(neighbor) && current.numMoves + 1 < open.numMoves) // TODO: Simplify
                             break;
-                        else if (open.board.equals(neighbor) && current.numMoves + 1 > open.numMoves)
+                        else if (open.board.equals(neighbor) && current.numMoves + 1 > open.numMoves) // Update
                         {
                             open.numMoves = current.numMoves + 1;
                             open.parent = current;
@@ -190,6 +229,10 @@ public class Solver {
         return solvedSequence;
     }
 
+    /**
+     * Test client!
+     * @param args Needs a text file containing the puzzle to solve
+     */
     public static void main(String[] args)
     {
         In readFile = new In(args[0]);

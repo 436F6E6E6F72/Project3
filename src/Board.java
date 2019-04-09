@@ -1,15 +1,16 @@
 import edu.princeton.cs.algs4.StdOut;
-import edu.princeton.cs.algs4.StdIn;
 import java.lang.Math;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
 public class Board {
 
+    // The 2D array of values for the puzzle
     private int[][] boardTiles;
+    // The hamming value of the board. Cached for efficiency
     private int hammingValue;
+    // the manhattan value of the board. Cached for efficiency
     private int manhattanValue;
 
     /**
@@ -30,28 +31,47 @@ public class Board {
         }
     }
 
+    /**
+     * The iteration class
+     */
     private class BoardIterable implements Iterable<Board> {
 
         private List<Board> boardList;
         private int index;
 
+        /**
+         * Iterable constructor
+         * @param boards The list to build off of
+         */
         public BoardIterable(List<Board> boards)
         {
             boardList = boards;
             index = 0;
         }
 
+        /**
+         * Check if there is another board after this
+         * @return True if there is another, false if not
+         */
         public boolean hasNext()
         {
             return (index != boardList.size() - 1);
         }
 
+        /**
+         * Gets the next element
+         * @return The next board
+         */
         public Board next()
         {
             index++;
             return boardList.get(index);
         }
 
+        /**
+         * Returns the class iterator
+         * @return the iterator object
+         */
         public Iterator<Board> iterator()
         {
             return boardList.iterator();
@@ -83,7 +103,7 @@ public class Board {
         {
             for (int j = 0; j < boardTiles.length; j++)
             {
-                returnVal.append((boardTiles[i][j] + " "));
+                returnVal.append((" " + boardTiles[i][j] + " "));
             }
             returnVal.append("\n");
         }
@@ -238,6 +258,11 @@ public class Board {
         return true;
     }
 
+    /**
+     * Helper fucntion to copy and array and not just make another reference
+     * @param arrayToCopy 2D int array to copy
+     * @return The copied 2D int array
+     */
     private int[][] copyArray(int[][] arrayToCopy)
     {
         int[][] copy = new int[arrayToCopy.length][arrayToCopy[0].length];
@@ -336,6 +361,10 @@ public class Board {
         }
     }
 
+    /**
+     * Unit testing client
+     * @param args None needed
+     */
     public static void main(String[] args)
     {
         int[][] testVals = {{1, 2, 3}, {4, 5, 6}, {7, 8, 0}};
