@@ -331,7 +331,10 @@ public class Board {
         StdOut.println(testBoard.isGoal());
         StdOut.println(testBoard.isSolvable());
         StdOut.println(testBoard.toString());
-
+        int[][] testVals2 = {{2, 1, 3}, {4, 5, 6}, {7, 8, 0}};
+        Board testBoard2 = new Board(testVals2);
+        if (testBoard.equals(testBoard2))
+            StdOut.println("Equal");
         Iterable<Board> iBoards = testBoard.neighbors();
         for (Board curr : iBoards) {
             StdOut.println(curr.toString());
