@@ -37,18 +37,19 @@ The Board class contains a 2D int array that contains the value of each tile on 
 
 Description:
 
+Unsolvable puzzles are detected based upon the length of each size of the puzzle, the number of inversion, and (depending upon length) the row that the open space (0) is on.
 
+The algorithm loops through every spot in the 2D integer array of values, it records the row that the open space is on when it finds it, and for every value it compares the current value to a list of all values it has found so far. For every value in the list that the current value is less than it increments the inversion counter. When it is done with that it adds the current value to the list and moves on to the next.  
 
-
-
+After it has the count of the number of inversions if the side length of the puzzle is odd it returns true if the number of inversions is even, false if not. If the length is even then it takes the number of inversions and adds the row that the open space is on. If that final value is even then it returns false, true otherwise. 
 
 
 
 Order of growth of running time:
 
+N^2 + N
 
-
-
+The function uses two nested for loops that grow at a rate of N where N is the length of the puzzle’s sides. Within the inner most loop there is another for loop that will iterate the number of spaces that the function has evaluated to that point. 
 
 
 
@@ -86,13 +87,7 @@ Order of growth of running time:
  *  or a better priority function (say, one on the order of improvement
  *  from Hamming to Manhattan)? Why?
  **************************************************************************** */
-
-
-
-
-
-
-
+DO THAT PART
 
 
 
@@ -100,21 +95,21 @@ Order of growth of running time:
  *  Known bugs / limitations.
  **************************************************************************** */
 
+The bigger the puzzle and more steps that it takes the longer the algorithm will take to solve it. It is only as good as the A* algorithm is.
 
 
 /* *****************************************************************************
  *  Describe whatever help (if any) that you received.
 **************************************************************************** */
 
-
-
+The only help I used was from the textbook, documentation for the Algs4 library, and the Wikipedia article on A*.
 
 
 /* *****************************************************************************
  *  Describe any serious problems you encountered.                    
  **************************************************************************** */
 
-
+I made some math errors on the Manhattan score and the solvable function. This caused some errors and serious slow-downs in my code. 
 
 /* *****************************************************************************
  *  If you worked with a partner, give one
@@ -122,10 +117,7 @@ Order of growth of running time:
  **************************************************************************** */
 
 
-
-
-
-
+Connor worked the most on the logic for the puzzle where Samantha focused on the A* algorithm, but no part was exclusively one person. We only worked on the project together, neither of us worked independently so the project was as a whole an entirely collaborative effort.
 
 /* *****************************************************************************
  *  List any other comments here. Feel free to provide any feedback   

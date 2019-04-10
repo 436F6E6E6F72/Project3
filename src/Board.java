@@ -1,6 +1,7 @@
 import edu.princeton.cs.algs4.StdOut;
 import java.lang.Math;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -202,23 +203,20 @@ public class Board {
     private int computeManhattan()
     {
         int manhattanVal = 0;
-        BoardVector offset;
+        int xOffset = 0, yOffset = 0;
         for (int i = 0; i < boardTiles.length; i++)
         {
             for (int j = 0; j < boardTiles[0].length; j++)
             {
-                if (boardTiles[i][j] != (i *  boardTiles.length) + j + 1  && boardTiles[i][j] != 0)
+                if (boardTiles[i][j] != (i * boardTiles.length) + j + 1 && boardTiles[i][j] != 0) // Wrong value in slot
                 {
-                    if (i == boardTiles.length - 1 && j == boardTiles.length - 1 && boardTiles[i][j] == 0 )
-                        continue;
-                    if (i == boardTiles.length - 1 && j == boardTiles.length - 1)
-                    {
-                        offset = getTilePos(0);
-                        manhattanVal += (Math.abs(offset.xVal - i) + Math.abs(offset.yVal - j));
-                        continue;
-                    }
-                    offset = getTilePos(i* boardTiles.length + j + 1);
-                    manhattanVal += (Math.abs(offset.xVal - i) + Math.abs(offset.yVal - j));
+                    xOffset =  (boardTiles[i][j] % boardTiles.length) - 1;
+                    if (xOffset == -1)
+                        xOffset = 2;
+                    yOffset = (boardTiles[i][j] - 1) / boardTiles.length;
+                    int total = (Math.abs(xOffset - j ) + Math.abs(yOffset - i));
+                    manhattanVal += (Math.abs(xOffset - j ) + Math.abs(yOffset - i));
+                    //StdOut.println("M: " + manhattanVal + " xOffset: " + xOffset + ", yOffset: " + yOffset + ", total: " + total + " at: " + i +", " + j);
                 }
             }
         }
@@ -251,15 +249,7 @@ public class Board {
         if (testBoard.boardTiles.length != boardTiles.length || testBoard.boardTiles[0].length != boardTiles[0].length)
             return false;
         // Check for tile equality
-        for (int i = 0; i < boardTiles.length; i++)
-        {
-            for (int j = 0; j < boardTiles[0].length; j++)
-            {
-                if (testBoard.tileAt(i, j) != boardTiles[i][j])
-                    return false;
-            }
-        }
-        return true;
+        return Arrays.deepEquals(boardTiles, testBoard.boardTiles);
     }
 
     /**
@@ -271,8 +261,9 @@ public class Board {
     {
         int[][] copy = new int[arrayToCopy.length][arrayToCopy[0].length];
         for (int i = 0; i < arrayToCopy.length; i++)
-            for (int j = 0; j < arrayToCopy[0].length; j++)
-                copy[i][j] = arrayToCopy[i][j];
+        {
+            copy[i] = arrayToCopy[i].clone();
+        }
         return copy;
     }
 
@@ -284,7 +275,6 @@ public class Board {
     {
         List<Board> neighborList = new ArrayList<>();
         BoardVector blankPos = getTilePos(0);
-
         int[][] setupHolder; // Duplicate current setup
         if (blankPos.xVal != boardTiles.length - 1) // Right value
         {
@@ -345,11 +335,10 @@ public class Board {
                 foundValues.add(boardTiles[i][j]);
             }
         }
-        //StdOut.println("Inversions: " + inversions);
         // Even board size
         if (boardTiles.length % 2 == 0)
         {
-            StdOut.println(inversions + " " + row0);
+            //StdOut.println(inversions + " " + row0);
             if ((inversions + row0) % 2 == 0 ) // inversions + row with blank is even
                 return false;
             else // Is odd
@@ -376,7 +365,7 @@ public class Board {
         StdOut.println("Goal? " + testBoard.isGoal());
         StdOut.println("Solvable: " + testBoard.isSolvable());
         StdOut.println("Hamming: " + testBoard.hamming() + " Manhattan: " + testBoard.manhattan());
-        int[][] testVals2 = {{2, 1, 3}, {4, 5, 6}, {7, 8, 0}};
+        int[][] testVals2 = {{8, 1, 3}, {4, 0, 2}, {7, 6, 5}};
         Board testBoard2 = new Board(testVals2);
         if (testBoard.equals(testBoard2))
             StdOut.println(testBoard.toString() + " EQUALS " + testBoard2.toString());
@@ -389,6 +378,13 @@ public class Board {
             for(int j = 0; j <  Math.sqrt(testBoard.size()); j++)
                 StdOut.print(testBoard.tileAt(i, j) + " ");
 
+        int[][] anotherTest = { {5,  6,  2},
+                {1,  8,  4},
+                {7,  3,  0}};
+        Board anotherBoard = new Board(anotherTest);
+        StdOut.println("Goal? " + anotherBoard.isGoal());
+        StdOut.println("Solvable: " + anotherBoard.isSolvable());
+        StdOut.println("Hamming: " + anotherBoard.hamming() + " Manhattan: " + anotherBoard.manhattan());
 
     }
 

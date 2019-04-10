@@ -100,11 +100,7 @@ public class Solver {
             if (testBoard.size() != board.size())
                 return false;
             // Check for tile equality
-            for (int i = 0; i < board.size(); i++)
-                for (int j = 0; j < board.size(); j++)
-                    if (testBoard.tileAt(i, j) != board.tileAt(i, j))
-                        return false;
-            return true;
+            return board.equals(testBoard);
         }
 
         /**
@@ -168,52 +164,54 @@ public class Solver {
 
         Game current = new Game(initial, 0, null);
 
-        openSet.insert(current);
+        // The current is solved
+        if (current.board.isGoal())
+        {
+            // Build list based off of parent path
+            List<Board> solvedList = new ArrayList<>();
+            while (current != null)
+            {
+                solvedList.add(current.board);
+                current = current.parent;
+                movesTaken++;
+            }
+            solvedSequence = new BoardIterable(solvedList);
+            return;
+        }
 
+        openSet.insert(current);
+        //int loopCount = 0;
         // Loop through all open set contents
         while (openSet.size() > 0)
         {
-            //StdOut.println(openSet.size());
             current = openSet.delMin();
             closedSet.insert(current);
 
-            // The current is solved
-            if (current.board.isGoal())
-            {
-                // Build list based off of parent path
-                List<Board> solvedList = new ArrayList<>();
-                while (current != null)
-                {
-                    solvedList.add(current.board);
-                    current = current.parent;
-                    movesTaken++;
-                }
-                solvedSequence = new BoardIterable(solvedList);
-                break;
-            }
             // Check all neighbors
             for (Board neighbor : current.board.neighbors())
             {
                 boolean alreadyStored = false;
                 for(Game closed : closedSet) // Look for it in closed, if in closed skip
                     if (closed.board.equals(neighbor))
+                    {
                         alreadyStored = true;
+                        break;
+                    }
                 if (alreadyStored) // Skip
                     continue;
                 for(Game open : openSet) // Loop for it in open set
                     if (open.board.equals(neighbor))
-                        alreadyStored = true;
-                if (!alreadyStored) // If not in open set add it!
-                    openSet.insert(new Game(neighbor, current.numMoves + 1, current)); // Discover it
-                else
-                    for(Game open : openSet) // If it is check what the priority is vs current
-                        if (open.board.equals(neighbor) && current.numMoves + 1 < open.numMoves) // TODO: Simplify
-                            break;
-                        else if (open.board.equals(neighbor) && current.numMoves + 1 > open.numMoves) // Create a new record
+                    {
+                        if (current.numMoves + 1 > open.numMoves)
                         {
                             openSet.insert(new Game(neighbor, current.numMoves + 1, current));
                         }
-
+                        alreadyStored = true;
+                        break;
+                    }
+                // If not in open set add it!
+                if (!alreadyStored)
+                    openSet.insert(new Game(neighbor, current.numMoves + 1, current)); // Discover it
             }
         }
     }
@@ -257,7 +255,7 @@ public class Solver {
                 puzzle[i][j] = readFile.readInt();
 
         Board testBoard = new Board(puzzle);
-        StdOut.println(testBoard.toString());
+        //StdOut.println(testBoard.toString());
         if (!testBoard.isSolvable())
         {
             StdOut.println("Unsolvable puzzle");
