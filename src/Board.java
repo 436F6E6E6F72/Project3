@@ -87,7 +87,7 @@ public class Board {
     {
         boardTiles = tiles;
         manhattanValue = computeManhattan();
-        hammingValue = computeHamming();
+        hammingValue = -1;
     }
 
     /**
@@ -156,7 +156,10 @@ public class Board {
      */
     public int hamming()
     {
-        return hammingValue;
+        if (hammingValue != -1)
+            return hammingValue;
+        else
+            return hammingValue = computeHamming();
     }
 
     /**
@@ -204,9 +207,10 @@ public class Board {
         {
             for (int j = 0; j < boardTiles[0].length; j++)
             {
-                if (boardTiles[i][j] != (i *  boardTiles.length) + j + 1 ||
-                    i == boardTiles.length - 1 && j == boardTiles.length - 1 && boardTiles[i][j] != 0 )
+                if (boardTiles[i][j] != (i *  boardTiles.length) + j + 1  && boardTiles[i][j] != 0)
                 {
+                    if (i == boardTiles.length - 1 && j == boardTiles.length - 1 && boardTiles[i][j] == 0 )
+                        continue;
                     if (i == boardTiles.length - 1 && j == boardTiles.length - 1)
                     {
                         offset = getTilePos(0);
@@ -227,7 +231,7 @@ public class Board {
      */
     public boolean isGoal()
     {
-        return (manhattanValue == 0 && hammingValue == 0);
+        return (manhattanValue == 0);
     }
 
     /**
@@ -321,28 +325,27 @@ public class Board {
      */
     public boolean isSolvable()
     {
+        if (isGoal()) // Possible for it to be solved but fail
+            return true;
         int inversions = 0;
-        int low = boardTiles[0][0];
         int row0 = -1;
+        List<Integer> foundValues = new ArrayList<>();
         for (int i = 0; i < boardTiles.length; i++)
         {
             for (int j = 0; j < boardTiles[0].length; j++)
             {
-                if (low == boardTiles[i][j]) // 0, 0
-                    continue;
-                if (boardTiles[i][j] == 0) // blank tile, track it
-                    row0 = i;
-                if (low < boardTiles[i][j]) // If the last low is < the next value no inversion and accounting for 0
-                    low = boardTiles[i][j];
-                else if (i != boardTiles.length - 1 && j != boardTiles.length - 1 && boardTiles[i][j] != 0)
-                    low = boardTiles[i][j];
-                else // Inversion
+                if ( boardTiles[i][j] == 0)
                 {
-                    inversions++;
-                    low = boardTiles[i][j];
+                    row0 = i;
+                    continue;
                 }
+                for (int recorded : foundValues)
+                    if (boardTiles[i][j] < recorded)
+                        inversions++;
+                foundValues.add(boardTiles[i][j]);
             }
         }
+        //StdOut.println("Inversions: " + inversions);
         // Even board size
         if (boardTiles.length % 2 == 0)
         {
@@ -367,19 +370,26 @@ public class Board {
      */
     public static void main(String[] args)
     {
-        int[][] testVals = {{1, 2, 3}, {4, 5, 6}, {7, 8, 0}};
+        int[][] testVals = {{8, 1, 3}, {4, 0, 2}, {7, 6, 5}};
         Board testBoard = new Board(testVals);
-        StdOut.println(testBoard.isGoal());
-        StdOut.println(testBoard.isSolvable());
         StdOut.println(testBoard.toString());
+        StdOut.println("Goal? " + testBoard.isGoal());
+        StdOut.println("Solvable: " + testBoard.isSolvable());
+        StdOut.println("Hamming: " + testBoard.hamming() + " Manhattan: " + testBoard.manhattan());
         int[][] testVals2 = {{2, 1, 3}, {4, 5, 6}, {7, 8, 0}};
         Board testBoard2 = new Board(testVals2);
         if (testBoard.equals(testBoard2))
-            StdOut.println("Equal");
+            StdOut.println(testBoard.toString() + " EQUALS " + testBoard2.toString());
         Iterable<Board> iBoards = testBoard.neighbors();
         for (Board curr : iBoards) {
             StdOut.println(curr.toString());
         }
+        StdOut.println("Print every slot by tileAt");
+        for (int i = 0; i < Math.sqrt(testBoard.size()); i++)
+            for(int j = 0; j <  Math.sqrt(testBoard.size()); j++)
+                StdOut.print(testBoard.tileAt(i, j) + " ");
+
+
     }
 
 

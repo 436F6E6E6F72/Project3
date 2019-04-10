@@ -144,14 +144,6 @@ public class Solver {
             throw new IllegalArgumentException("Board cannot be null");
         if (!initial.isSolvable())
             throw new IllegalArgumentException("Board is unsolvable");
-        if (initial.isGoal())
-        {
-            movesTaken = 0;
-            List<Board> solvedList = new ArrayList<>();
-            solvedList.add(initial);
-            solvedSequence = new BoardIterable(solvedList);
-            return;
-        }
         movesTaken = -1;
         solveAStar(initial);
     }
@@ -257,7 +249,7 @@ public class Solver {
                 puzzle[i][j] = readFile.readInt();
 
         Board testBoard = new Board(puzzle);
-        StdOut.println(testBoard.toString());
+        //StdOut.println(testBoard.toString());
         if (!testBoard.isSolvable())
         {
             StdOut.println("Unsolvable puzzle");
@@ -267,7 +259,6 @@ public class Solver {
         Solver testSolver = new Solver(testBoard);
 
         StdOut.println("Minimum number of moves = " + testSolver.moves());
-
         for(Board board: testSolver.solution())
         {
             StdOut.println(board.toString());
