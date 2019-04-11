@@ -16,11 +16,7 @@ The Board class contains a 2D int array that contains the value of each tile on 
  **************************************************************************** */
 
 
-
-
-
-
-
+Each search node in mine is a class called ‘Game’. Each node contains a board at a specific game state, the number of moves it took to get there, the priority of the node, and the parent that it came from. For the searching algorithm these were then stored in a min priority queue. As a result, these also had to support the compareTo function.  
 
 
 
@@ -47,9 +43,9 @@ After it has the count of the number of inversions if the side length of the puz
 
 Order of growth of running time:
 
-N^2 + N
+N^2 
 
-The function uses two nested for loops that grow at a rate of N where N is the length of the puzzle’s sides. Within the inner most loop there is another for loop that will iterate the number of spaces that the function has evaluated to that point. 
+The function uses two nested for loops that grow at a rate of sqrt(N) where N is the number of total slots. Within the inner most loop there is another for loop that will iterate the number of spaces that the function has evaluated to that point. 
 
 
 
@@ -69,9 +65,9 @@ The function uses two nested for loops that grow at a rate of N where N is the l
                  min number          seconds
      instance     of moves     Hamming     Manhattan
    ------------  ----------   ----------   ----------
-   puzzle28.txt 
-   puzzle30.txt 
-   puzzle32.txt 
+   puzzle28.txt 		28				1.68
+   puzzle30.txt 		30				6.63
+   puzzle32.txt 		
    puzzle34.txt 
    puzzle36.txt 
    puzzle38.txt 
@@ -102,7 +98,7 @@ The bigger the puzzle and more steps that it takes the longer the algorithm will
  *  Describe whatever help (if any) that you received.
 **************************************************************************** */
 
-The only help I used was from the textbook, documentation for the Algs4 library, and the Wikipedia article on A*.
+The only help we used was from the textbook, documentation for the Algs4 library, and the Wikipedia article on A*.
 
 
 /* *****************************************************************************

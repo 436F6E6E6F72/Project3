@@ -1,3 +1,13 @@
+/*************************************************************************
+ * Names: Connor Adams and Samantha Bagwell
+ *
+ * Description: This class solves the Board class with the A* algorithm.
+ * It then creates an iterable with the solved sequence
+ *
+ * Use with min priority queues to solve.
+ *
+ *************************************************************************/
+
 import edu.princeton.cs.algs4.StdOut;
 import edu.princeton.cs.algs4.In;
 import edu.princeton.cs.algs4.MinPQ;
@@ -111,10 +121,6 @@ public class Solver {
         @Override
         public int compareTo(Object y)
         {
-            /*if (this == y) // Same ref
-                return 0;
-            if (y == null)
-                return 0;*/
             Game testGame = (Game)y;
             if (this.priority < testGame.priority)
                 return -1;
@@ -159,61 +165,53 @@ public class Solver {
     private void solveAStar(Board initial)
     {
         // Init local PQs
-        MinPQ<Game> closedSet = new MinPQ<>();
+        //MinPQ<Game> closedSet = new MinPQ<>();
         MinPQ<Game> openSet = new MinPQ<>();
 
         Game current = new Game(initial, 0, null);
-
-        // The current is solved
-        if (current.board.isGoal())
-        {
-            // Build list based off of parent path
-            List<Board> solvedList = new ArrayList<>();
-            while (current != null)
-            {
-                solvedList.add(current.board);
-                current = current.parent;
-                movesTaken++;
-            }
-            solvedSequence = new BoardIterable(solvedList);
-            return;
-        }
+        //Game other_current = new Game(initial, 0, null);
 
         openSet.insert(current);
-        //int loopCount = 0;
+        //closedSet.insert(other_current);
         // Loop through all open set contents
-        while (openSet.size() > 0)
+        while (!current.board.isGoal())// && !other_current.board.isGoal())
         {
-            current = openSet.delMin();
-            closedSet.insert(current);
-
-            // Check all neighbors
-            for (Board neighbor : current.board.neighbors())
-            {
-                boolean alreadyStored = false;
-                for(Game closed : closedSet) // Look for it in closed, if in closed skip
-                    if (closed.board.equals(neighbor))
-                    {
-                        alreadyStored = true;
-                        break;
-                    }
-                if (alreadyStored) // Skip
-                    continue;
-                for(Game open : openSet) // Loop for it in open set
-                    if (open.board.equals(neighbor))
-                    {
-                        if (current.numMoves + 1 > open.numMoves)
-                        {
-                            openSet.insert(new Game(neighbor, current.numMoves + 1, current));
-                        }
-                        alreadyStored = true;
-                        break;
-                    }
-                // If not in open set add it!
-                if (!alreadyStored)
-                    openSet.insert(new Game(neighbor, current.numMoves + 1, current)); // Discover it
+            // Check for next
+            for (Board neighbor : current.board.neighbors()) {
+                if (current.parent == null || !neighbor.equals(current.parent.board)) {
+                    openSet.insert(new Game(neighbor, current.numMoves + 1, current));
+                }
             }
+            current = openSet.delMin();
+
+            // Double check
+            /*for (Board neighbor : other_current.board.neighbors()) {
+                if (other_current.parent == null || !neighbor.equals(other_current.parent.board)) {
+                    closedSet.insert(new Game(neighbor, other_current.numMoves + 1, other_current));
+                }
+            }
+            other_current = closedSet.delMin();
+            */
+
+
         }
+        // Build the goal iterable
+        Game goal;
+        //if (current.board.isGoal())
+            goal = current;
+        //else
+        //    goal = other_current;
+        // Build list based off of parent path
+        List<Board> solvedList = new ArrayList<>();
+        while (goal != null)
+        {
+            solvedList.add(goal.board);
+            goal = goal.parent;
+            movesTaken++;
+        }
+        solvedSequence = new BoardIterable(solvedList);
+
+
     }
 
     /**
@@ -255,7 +253,7 @@ public class Solver {
                 puzzle[i][j] = readFile.readInt();
 
         Board testBoard = new Board(puzzle);
-        //StdOut.println(testBoard.toString());
+        //StdOut.println(testBoard.manhattan() + " " + testBoard.toString());
         if (!testBoard.isSolvable())
         {
             StdOut.println("Unsolvable puzzle");

@@ -1,4 +1,16 @@
-import edu.princeton.cs.algs4.StdOut;
+/*************************************************************************
+ * Names: Connor Adams and Samantha Bagwell
+ *
+ * Description: This is the board class for an 8 Puzzle, although it can
+ * support much larger puzzles than 8. They are labeled 1 - N where
+ * N the side length squared, leaving one last value of 0 as the blank.
+ *
+ * Use with the solver to implement into min priority queues and solve
+ * with A* or similar algorithms
+ *
+*************************************************************************/
+
+ import edu.princeton.cs.algs4.StdOut;
 import java.lang.Math;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -13,6 +25,8 @@ public class Board {
     private int hammingValue;
     // the manhattan value of the board. Cached for efficiency
     private int manhattanValue;
+    // Tracking where 0 was found in the different fitness functions for efficient swapping
+    private BoardVector zeroLoc;
 
     /**
      * Helper class. Just contains the x, y of a board position
@@ -86,8 +100,9 @@ public class Board {
      */
     public Board(int[][] tiles)
     {
+        //zeroLoc = new BoardVector(-1, -1);
         boardTiles = tiles;
-        manhattanValue = computeManhattan();
+        manhattanValue = -1;
         hammingValue = -1;
     }
 
@@ -130,25 +145,7 @@ public class Board {
      */
     public int size()
     {
-        return boardTiles.length * boardTiles[0].length;
-    }
-
-    /**
-     * Helper function, returns the vector of a given tile value
-     * @param tile the tile value to find the location of
-     * @return a vector containing the x, y of the tile
-     */
-    private BoardVector getTilePos(int tile)
-    {
-        BoardVector pos;
-        for (int i = 0; i < boardTiles.length; i++)
-            for (int j = 0; j < boardTiles[0].length; j++)
-                if (boardTiles[i][j] == tile)
-                {
-                    pos = new BoardVector(i, j);
-                    return pos;
-                }
-        return pos = new BoardVector(-1, -1);
+        return boardTiles.length;
     }
 
     /**
@@ -157,10 +154,9 @@ public class Board {
      */
     public int hamming()
     {
-        if (hammingValue != -1)
-            return hammingValue;
-        else
-            return hammingValue = computeHamming();
+        if (hammingValue == -1)
+            return computeHamming();
+        return hammingValue;
     }
 
     /**
@@ -175,6 +171,8 @@ public class Board {
         {
             for (int j = 0; j < boardTiles[0].length; j++)
             {
+                if (boardTiles[i][j] == 0)
+                    zeroLoc = new BoardVector(i, j);
                 // Skip the last tile
                 if (i == boardTiles.length - 1 && j == boardTiles.length - 1)
                     continue;
@@ -193,6 +191,8 @@ public class Board {
      */
     public int manhattan()
     {
+        if (manhattanValue == -1)
+            manhattanValue = computeManhattan();
         return manhattanValue;
     }
 
@@ -206,16 +206,19 @@ public class Board {
         int xOffset = 0, yOffset = 0;
         for (int i = 0; i < boardTiles.length; i++)
         {
-            for (int j = 0; j < boardTiles[0].length; j++)
+            for (int j = 0; j < boardTiles.length; j++)
             {
-                if (boardTiles[i][j] != (i * boardTiles.length) + j + 1 && boardTiles[i][j] != 0) // Wrong value in slot
+                if (boardTiles[i][j] == 0)
                 {
-                    xOffset =  (boardTiles[i][j] % boardTiles.length) - 1;
-                    if (xOffset == -1)
-                        xOffset = 2;
-                    yOffset = (boardTiles[i][j] - 1) / boardTiles.length;
-                    int total = (Math.abs(xOffset - j ) + Math.abs(yOffset - i));
-                    manhattanVal += (Math.abs(xOffset - j ) + Math.abs(yOffset - i));
+                    zeroLoc = new BoardVector(i, j); // Recording this for other functions
+                    continue;
+                }
+                if (boardTiles[i][j] != (i * boardTiles.length) + j + 1) // Wrong value in slot
+                {
+                    xOffset = (int)Math.floor((double)(boardTiles[i][j] - 1) / (double)boardTiles.length);
+                    yOffset = (boardTiles[i][j] - 1) % boardTiles.length;
+                    //StdOut.println("Adding: " + (Math.abs(i - xOffset ) + Math.abs(j - yOffset)));
+                    manhattanVal += (Math.abs(i - xOffset ) + Math.abs(j - yOffset));
                     //StdOut.println("M: " + manhattanVal + " xOffset: " + xOffset + ", yOffset: " + yOffset + ", total: " + total + " at: " + i +", " + j);
                 }
             }
@@ -229,6 +232,8 @@ public class Board {
      */
     public boolean isGoal()
     {
+        if (manhattanValue == -1)
+            computeManhattan();
         return (manhattanValue == 0);
     }
 
@@ -246,7 +251,7 @@ public class Board {
             return false;
         Board testBoard = (Board)y;
         // Check for size
-        if (testBoard.boardTiles.length != boardTiles.length || testBoard.boardTiles[0].length != boardTiles[0].length)
+        if (testBoard.size() != size())
             return false;
         // Check for tile equality
         return Arrays.deepEquals(boardTiles, testBoard.boardTiles);
@@ -274,34 +279,36 @@ public class Board {
     public Iterable<Board> neighbors()
     {
         List<Board> neighborList = new ArrayList<>();
-        BoardVector blankPos = getTilePos(0);
+        if (zeroLoc.xVal == -1)
+            computeHamming();
+
         int[][] setupHolder; // Duplicate current setup
-        if (blankPos.xVal != boardTiles.length - 1) // Right value
+        if (zeroLoc.xVal != boardTiles.length - 1) // Right value
         {
             setupHolder = copyArray(boardTiles);
-            setupHolder[blankPos.xVal][blankPos.yVal] = setupHolder[blankPos.xVal + 1][blankPos.yVal];
-            setupHolder[blankPos.xVal + 1][blankPos.yVal] = 0;
+            setupHolder[zeroLoc.xVal][zeroLoc.yVal] = setupHolder[zeroLoc.xVal + 1][zeroLoc.yVal];
+            setupHolder[zeroLoc.xVal + 1][zeroLoc.yVal] = 0;
             neighborList.add(new Board(setupHolder));
         }
-        if (blankPos.yVal != boardTiles[0].length - 1) // Bottom value
+        if (zeroLoc.yVal != boardTiles[0].length - 1) // Bottom value
         {
             setupHolder = copyArray(boardTiles);
-            setupHolder[blankPos.xVal][blankPos.yVal] = setupHolder[blankPos.xVal][blankPos.yVal + 1];
-            setupHolder[blankPos.xVal][blankPos.yVal + 1] = 0;
+            setupHolder[zeroLoc.xVal][zeroLoc.yVal] = setupHolder[zeroLoc.xVal][zeroLoc.yVal + 1];
+            setupHolder[zeroLoc.xVal][zeroLoc.yVal + 1] = 0;
             neighborList.add(new Board(setupHolder));
         }
-        if (blankPos.xVal != 0) // Left value
+        if (zeroLoc.xVal != 0) // Left value
         {
             setupHolder = copyArray(boardTiles);
-            setupHolder[blankPos.xVal][blankPos.yVal] = setupHolder[blankPos.xVal - 1][blankPos.yVal];
-            setupHolder[blankPos.xVal - 1][blankPos.yVal] = 0;
+            setupHolder[zeroLoc.xVal][zeroLoc.yVal] = setupHolder[zeroLoc.xVal - 1][zeroLoc.yVal];
+            setupHolder[zeroLoc.xVal - 1][zeroLoc.yVal] = 0;
             neighborList.add(new Board(setupHolder));
         }
-        if (blankPos.yVal != 0) // Top value
+        if (zeroLoc.yVal != 0) // Top value
         {
             setupHolder = copyArray(boardTiles);
-            setupHolder[blankPos.xVal][blankPos.yVal] = setupHolder[blankPos.xVal][blankPos.yVal - 1];
-            setupHolder[blankPos.xVal][blankPos.yVal - 1] = 0;
+            setupHolder[zeroLoc.xVal][zeroLoc.yVal] = setupHolder[zeroLoc.xVal][zeroLoc.yVal - 1];
+            setupHolder[zeroLoc.xVal][zeroLoc.yVal - 1] = 0;
             neighborList.add(new Board(setupHolder));
         }
         return new BoardIterable(neighborList);
